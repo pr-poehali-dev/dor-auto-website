@@ -2,8 +2,17 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Icon from "@/components/ui/icon";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { useState } from "react";
 
 const Index = () => {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const handleMenuClick = (id: string) => {
+    setMobileMenuOpen(false);
+    setTimeout(() => {
+      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+  };
   const services = [
     {
       icon: "Wrench",
@@ -73,13 +82,53 @@ const Index = () => {
               <p className="text-sm text-primary-foreground/80">Профессиональный автосервис</p>
             </div>
           </div>
+          
           <nav className="hidden md:flex gap-6">
             <a href="#about" className="hover:text-accent transition-colors">О нас</a>
             <a href="#services" className="hover:text-accent transition-colors">Услуги</a>
             <a href="#reviews" className="hover:text-accent transition-colors">Отзывы</a>
             <a href="#contacts" className="hover:text-accent transition-colors">Контакты</a>
           </nav>
+
+          <button 
+            className="md:hidden p-2 hover:bg-primary-foreground/10 rounded-md transition-colors"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Меню"
+          >
+            <Icon name={mobileMenuOpen ? "X" : "Menu"} size={24} />
+          </button>
         </div>
+
+        {mobileMenuOpen && (
+          <div className="md:hidden absolute top-full left-0 right-0 bg-primary border-t border-primary-foreground/20 shadow-lg animate-fade-in">
+            <nav className="container mx-auto px-4 py-4 flex flex-col gap-4">
+              <a 
+                onClick={() => handleMenuClick('about')} 
+                className="hover:text-accent transition-colors py-2 cursor-pointer"
+              >
+                О нас
+              </a>
+              <a 
+                onClick={() => handleMenuClick('services')} 
+                className="hover:text-accent transition-colors py-2 cursor-pointer"
+              >
+                Услуги
+              </a>
+              <a 
+                onClick={() => handleMenuClick('reviews')} 
+                className="hover:text-accent transition-colors py-2 cursor-pointer"
+              >
+                Отзывы
+              </a>
+              <a 
+                onClick={() => handleMenuClick('contacts')} 
+                className="hover:text-accent transition-colors py-2 cursor-pointer"
+              >
+                Контакты
+              </a>
+            </nav>
+          </div>
+        )}
       </header>
 
       <section className="relative py-20 md:py-32 bg-gradient-to-br from-primary to-primary/80 text-primary-foreground overflow-hidden">
