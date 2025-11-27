@@ -3,9 +3,18 @@ import { Card, CardContent } from "@/components/ui/card";
 import Icon from "@/components/ui/icon";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 const Index = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [selectedService, setSelectedService] = useState<number | null>(null);
+  const [phone, setPhone] = useState("");
 
   const handleMenuClick = (id: string) => {
     setMobileMenuOpen(false);
@@ -13,36 +22,57 @@ const Index = () => {
       document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
     }, 100);
   };
+
+  const formatPhoneNumber = (value: string) => {
+    const phoneNumber = value.replace(/\D/g, "");
+    if (phoneNumber.length === 0) return "";
+    if (phoneNumber.length <= 1) return `+7 (${phoneNumber}`;
+    if (phoneNumber.length <= 4) return `+7 (${phoneNumber.slice(1)}`;
+    if (phoneNumber.length <= 7) return `+7 (${phoneNumber.slice(1, 4)}) ${phoneNumber.slice(4)}`;
+    if (phoneNumber.length <= 9) return `+7 (${phoneNumber.slice(1, 4)}) ${phoneNumber.slice(4, 7)}-${phoneNumber.slice(7)}`;
+    return `+7 (${phoneNumber.slice(1, 4)}) ${phoneNumber.slice(4, 7)}-${phoneNumber.slice(7, 9)}-${phoneNumber.slice(9, 11)}`;
+  };
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatPhoneNumber(e.target.value);
+    setPhone(formatted);
+  };
   const services = [
     {
       icon: "Wrench",
       title: "Техническое обслуживание",
-      description: "Полный комплекс работ по регламентному ТО любой сложности"
+      description: "Полный комплекс работ по регламентному ТО любой сложности",
+      details: "Включает замену масла и фильтров, проверку тормозной системы, диагностику подвески, контроль уровня жидкостей, регулировку углов установки колес. Проводим ТО в соответствии с регламентом производителя. Используем только оригинальные или сертифицированные расходные материалы."
     },
     {
       icon: "Settings",
       title: "Ремонт двигателя",
-      description: "Диагностика и ремонт двигателей всех типов и марок автомобилей"
+      description: "Диагностика и ремонт двигателей всех типов и марок автомобилей",
+      details: "Выполняем капитальный ремонт двигателей, замену ГРМ, ремонт головки блока цилиндров, замену поршневой группы. Работаем с бензиновыми, дизельными и гибридными двигателями. Компьютерная диагностика перед началом работ. Гарантия на все виды работ."
     },
     {
       icon: "Gauge",
       title: "Диагностика",
-      description: "Компьютерная диагностика всех систем автомобиля на современном оборудовании"
+      description: "Компьютерная диагностика всех систем автомобиля на современном оборудовании",
+      details: "Проводим комплексную диагностику: двигателя, трансмиссии, подвески, тормозной системы, электроники. Используем профессиональное оборудование для точного определения неисправностей. Предоставляем подробный отчет с рекомендациями по устранению выявленных проблем."
     },
     {
       icon: "Sparkles",
       title: "Кузовной ремонт",
-      description: "Восстановление геометрии кузова, покраска, полировка"
+      description: "Восстановление геометрии кузова, покраска, полировка",
+      details: "Выполняем рихтовку, сварочные работы, покраску в заводской цвет, полировку и защиту кузова. Имеем собственную покрасочную камеру. Работаем со всеми видами повреждений после ДТП. Подбор краски компьютерным методом. Гарантия на покрасочные работы."
     },
     {
       icon: "CircleDot",
       title: "Шиномонтаж",
-      description: "Балансировка колес, замена шин, сезонное хранение"
+      description: "Балансировка колес, замена шин, сезонное хранение",
+      details: "Предоставляем услуги по монтажу и демонтажу шин, балансировке колес, ремонту проколов, правке дисков. Сезонное хранение шин в специальном помещении с соблюдением всех условий. Продажа новых шин ведущих производителей. Консультация по подбору резины."
     },
     {
       icon: "Battery",
       title: "Электрика",
-      description: "Ремонт и обслуживание электрооборудования автомобиля"
+      description: "Ремонт и обслуживание электрооборудования автомобиля",
+      details: "Диагностика и ремонт электропроводки, замена аккумуляторов, ремонт генераторов и стартеров, установка дополнительного оборудования (сигнализации, камеры, парктроники). Работаем с бортовыми компьютерами и электронными системами управления."
     }
   ];
 
@@ -213,7 +243,8 @@ const Index = () => {
             {services.map((service, index) => (
               <Card 
                 key={index} 
-                className="hover-scale transition-all duration-300 hover:shadow-lg border-2 hover:border-accent/50"
+                className="hover-scale transition-all duration-300 hover:shadow-lg border-2 hover:border-accent/50 cursor-pointer"
+                onClick={() => setSelectedService(index)}
               >
                 <CardContent className="p-6">
                   <div className="w-14 h-14 bg-accent/10 rounded-full flex items-center justify-center mb-4">
@@ -221,6 +252,10 @@ const Index = () => {
                   </div>
                   <h3 className="text-xl font-semibold mb-2 text-foreground">{service.title}</h3>
                   <p className="text-muted-foreground">{service.description}</p>
+                  <div className="mt-4 text-accent text-sm flex items-center gap-1">
+                    <span>Подробнее</span>
+                    <Icon name="ChevronRight" size={16} />
+                  </div>
                 </CardContent>
               </Card>
             ))}
@@ -275,15 +310,26 @@ const Index = () => {
                     <Icon name="MapPin" className="text-accent mt-1" size={20} />
                     <div>
                       <p className="font-medium text-foreground">Адрес:</p>
-                      <p className="text-muted-foreground">г. Москва, ул. Автомобильная, д. 25</p>
+                      <p className="text-muted-foreground">г. Саратов, ул. имени С.Ф. Тархова, 6В</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <Icon name="Phone" className="text-accent mt-1" size={20} />
                     <div>
                       <p className="font-medium text-foreground">Телефон:</p>
-                      <p className="text-muted-foreground">+7 (495) 123-45-67</p>
+                      <a href="tel:+79371552506" className="text-muted-foreground hover:text-accent transition-colors">+7 937 155 25 06</a>
                     </div>
+                  </div>
+                  <div className="flex gap-3 mt-2">
+                    <a href="https://wa.me/79371552506" target="_blank" rel="noopener noreferrer" className="text-accent hover:text-accent/80 transition-colors">
+                      <Icon name="MessageCircle" size={24} />
+                    </a>
+                    <a href="https://vk.com" target="_blank" rel="noopener noreferrer" className="text-accent hover:text-accent/80 transition-colors">
+                      <Icon name="Share2" size={24} />
+                    </a>
+                    <a href="https://t.me" target="_blank" rel="noopener noreferrer" className="text-accent hover:text-accent/80 transition-colors">
+                      <Icon name="Send" size={24} />
+                    </a>
                   </div>
                   <div className="flex items-start gap-3">
                     <Icon name="Clock" className="text-accent mt-1" size={20} />
@@ -322,7 +368,9 @@ const Index = () => {
                   <div>
                     <input
                       type="tel"
-                      placeholder="Телефон"
+                      placeholder="+7 (___) ___-__-__"
+                      value={phone}
+                      onChange={handlePhoneChange}
                       className="w-full px-4 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-accent"
                       required
                     />
@@ -364,10 +412,43 @@ const Index = () => {
             <p className="text-lg font-semibold">ДОР-авто</p>
           </div>
           <p className="text-primary-foreground/80">
-            © 2024 ДОР-авто. Все права защищены.
+            © 2025 ДОР-авто. Все права защищены.
           </p>
         </div>
       </footer>
+
+      <Dialog open={selectedService !== null} onOpenChange={() => setSelectedService(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-accent/10 rounded-full flex items-center justify-center">
+                <Icon name={services[selectedService ?? 0]?.icon} size={24} className="text-accent" />
+              </div>
+              {services[selectedService ?? 0]?.title}
+            </DialogTitle>
+          </DialogHeader>
+          <DialogDescription className="text-base leading-relaxed pt-4">
+            {services[selectedService ?? 0]?.details}
+          </DialogDescription>
+          <div className="flex gap-2 mt-6">
+            <Button 
+              className="flex-1 bg-accent hover:bg-accent/90 text-accent-foreground"
+              onClick={() => {
+                setSelectedService(null);
+                document.getElementById('contacts')?.scrollIntoView({ behavior: 'smooth' });
+              }}
+            >
+              Записаться на услугу
+            </Button>
+            <Button 
+              variant="outline"
+              onClick={() => setSelectedService(null)}
+            >
+              Закрыть
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
